@@ -1,0 +1,33 @@
+# parameter for gunicorn command line
+gunicorn_instance: "fibonacci_webservice"
+gunicorn_bind: "127.0.0.1:8000"
+gunicorn_app_dir: "/tmp/gunicorn_app/"
+gunicorn_wsgi: "main:app"
+gunicorn_workers: 1
+
+# parameter for gunicorn's init.d file and default configuration file
+gunicorn_conf_dir: "/etc/gunicorn"
+gunicorn_log_dir: "/var/log/gunicorn"
+gunicorn_loglevel: "debug"
+gunicorn_accesslog: "{{ gunicorn_log_dir }}/access.log"
+gunicorn_errorlog: "{{ gunicorn_log_dir }}/error.log" 
+gunicorn_venv: "/home/shen/pythonenv/python3.6/handson-ml"
+gunicorn_pidfile_dir: "/var/run/gunicorn"
+
+nginx_vhosts:
+  - listen: "80"
+    server_name: "localhost"
+    # TODO: proxy to multiple node for loadbalance
+    proxy_pass: "http://{{ gunicorn_bind }}"
+    access_log: "/var/log/nginx/access.log"
+    error_log: "/var/log/nginx/error.log"
+    state: "present"
+    template: "webservice.j2"
+    filename: "fibonacci_webservice.conf"
+
+ansible_user: root
+virtualenv_dir: /tmp/virtualenv
+virtualenv_requirements_file: "{{ virtualenv_dir }}/requirements.txt"
+virtualenv_python: /home/shen/pythonenv/python3.6/handson-ml/bin/python
+virtualenv_pip_executable: pip3.6
+

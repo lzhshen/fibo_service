@@ -1,0 +1,16 @@
+- name: Create virtualenv base directory
+  file: 
+    name: "{{ virtualenv_base_dir }}"
+    state: directory
+
+- name: Create virtualenv  
+  command: "{{ virtualenv_executable }} {{ virtualenv_base_dir }}/{{ virtualenv_name }}  "
+  register: myoutput
+
+- debug: msg="{{ myoutput.stdout }}"
+
+- name: Install python packages required
+  shell: "source {{ virtualenv_base_dir }}/{{ virtualenv_name }}/bin/activate && pip3 install -r {{ virtualenv_pip_requirements_file }}"
+  register: myoutput
+
+- debug: msg="{{ myoutput.stdout }}"

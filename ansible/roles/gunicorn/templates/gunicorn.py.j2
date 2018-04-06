@@ -1,0 +1,5 @@
+accesslog = {% if gunicorn_accesslog %}'{{ gunicorn_accesslog }}'{% else %}None{% endif %}
+
+errorlog = {% if gunicorn_errorlog %}'{{ gunicorn_errorlog }}'{% else %}None{% endif %}
+
+loglevel = '{{ gunicorn_loglevel }}'

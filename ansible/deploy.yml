@@ -1,0 +1,9 @@
+---
+# file: webservers.yml
+- hosts: localhost
+  vars_files:
+    - group_vars/vagrant.yml
+  roles:
+    - nginx 
+    - virtualenv
+    - gunicorn

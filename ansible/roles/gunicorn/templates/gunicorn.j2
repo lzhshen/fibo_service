@@ -1,0 +1,133 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:             gunicorn
+# Required-Start:     $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:         0 1 6
+# Short-Description: starts the gunicorn server
+# Description:         starts gunicorn using start-stop-daemon
+### END INIT INFO
+
+# Gunicorn init.d script for redhat/centos
+# Written originally by Wojtek 'suda' Siudzinski <admin@suda.pl>
+# Adapted to redhat/centos by Daniel Lemos <xspager@gmail.com>
+# Gist: https://gist.github.com/1511911
+# Original: https://gist.github.com/748450
+        
+#
+# Sample config (/etc/gunicorn/gunicorn.conf):
+#
+# SERVERS=(
+#    'server_name    socket_or_url    project_path    number_of_workers'
+# )
+# RUN_AS='www-data'
+#
+# WARNING: user $RUN_AS must have +w on /var/run/gunicorn
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+NAME=gunicorn
+DESC=gunicorn
+DAEMON={{ gunicorn_venv }}/bin/gunicorn
+GUNICORN_INSTANCE_FILE={{ gunicorn_conf_dir }}/gunicorn.conf
+GUNICORN_COMMON_CONF_FILE={{ gunicorn_conf_dir }}/gunicorn.py
+PID_FILE_DIR={{ gunicorn_pidfile_dir }}
+
+test -x $DAEMON || exit 0
+
+# Source function library.
+#. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+#. /etc/sysconfig/network
+
+# Check that networking is up.
+[ "$NETWORKING" = "no" ] && exit 0
+
+if [ -f ${GUNICORN_INSTANCE_FILE} ] ; then
+    . ${GUNICORN_INSTANCE_FILE}
+fi
+
+if [ ! -d ${PID_FILE_DIR} ]; then
+    mkdir ${PID_FILE_DIR}
+fi
+
+function isRunning() {
+    if [ -f $1 ] ; then
+        cat $1
+        return 0
+    else
+        return 1
+    fi
+}
+
+start () {
+    for i in "${SERVERS[@]}"
+    do
+        :
+        set -- "$i"
+        IFS=" "; declare -a data=($*)
+        
+        # check is the process is aleary running 
+        isRunning ${PID_FILE_DIR}/${data[0]}.pid
+        if [ $? -eq 0 ]; then
+            echo "${data[0]} is already running."
+            continue
+        fi
+
+        echo "Spawning ${data[0]}"
+        $DAEMON -b ${data[1]} -c ${GUNICORN_COMMON_CONF_FILE} -w ${data[4]} --chdir ${data[2]} -D -p ${PID_FILE_DIR}/${data[0]}.pid ${data[3]}
+    done
+}
+
+stop () {
+    for i in "${SERVERS[@]}"
+    do
+        :
+        set -- "$i"
+        IFS=" "; declare -a data=($*)
+        if [ -f ${PID_FILE_DIR}/${data[0]}.pid ]; then
+            echo "Killing ${data[0]}"
+            kill $(cat /var/run/gunicorn/${data[0]}.pid)
+        fi
+    done    
+}
+
+status () {
+    for i in "${SERVERS[@]}"
+    do
+        :
+        set -- "$i"
+        IFS=" "; declare -a data=($*)
+        isRunning ${PID_FILE_DIR}/${data[0]}.pid
+    done    
+}
+
+case "$1" in
+  start)
+        echo "Starting $DESC"
+        start
+        ;;
+  stop)
+        echo "Stopping $DESC"
+        stop
+        ;;
+  status)
+        echo "Status $DESC"
+        status
+        ;;
+  restart)
+        echo "Restarting $DESC"
+        stop
+        sleep 1
+        start
+        ;;
+  *)
+        N=/etc/init.d/$NAME
+        echo "Usage: $N {start|stop|status|restart}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0

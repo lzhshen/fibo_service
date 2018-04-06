@@ -1,0 +1,30 @@
+---
+- name: Create gunicorn log directory
+  file: name={{ gunicorn_log_dir }} state=directory owner={{ gunicorn_user }}
+
+- name: Create gunicorn configuration directory
+  file: name={{ gunicorn_conf_dir }} state=directory
+
+- name: Create gunicorn pid file directory
+  file: name={{ gunicorn_pidfile_dir }} state=directory owner={{ gunicorn_user }}
+
+- name: Install gunicorn start/stop/status/restart script
+  template: 
+    src: gunicorn.j2 
+    dest: /etc/init.d/gunicorn
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Install gunicorn common config
+  template: src=gunicorn.py.j2 dest={{ gunicorn_conf_dir }}/gunicorn.py
+  notify: Restart gunicorn
+
+- name: Install gunicorn instance config
+  template: src=gunicorn.conf.j2 dest={{ gunicorn_conf_dir }}/gunicorn.conf
+  notify: Restart gunicorn
+
+- name: Start gunicorn, if not running
+  command: service gunicorn start
+  tags:
+    - gunicorn

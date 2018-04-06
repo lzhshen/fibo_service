@@ -1,0 +1,29 @@
+server {
+{% if item.listen is defined %}
+    listen       {{ item.listen }} ;
+{% endif %}
+
+{% if item.server_name is defined %}
+    server_name  {{ item.server_name }};
+{% endif %}
+
+{% if item.proxy_pass is defined %}
+    location / {
+        proxy_pass {{ item.proxy_pass }};
+    }
+{% endif %}
+
+{% if item.error_page is defined %}
+    error_page {{ item.error_page }};
+{% endif %}
+
+{% if item.access_log is defined %}
+    access_log {{ item.access_log }};
+{% endif %}
+
+{% if item.error_log is defined %}
+    error_log {{ item.error_log }} error;
+{% endif %}
+
+}
+
