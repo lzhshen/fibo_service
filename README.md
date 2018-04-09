@@ -113,7 +113,7 @@ curl 'http://localhost:5000/api/fibonacci/5'
 
 ## Some thought about future work
  
-It could become a complex problem if this service should support real big parameter 'n' in Fibonacci(n), like number larger than 1 million or billion. One of possible architecture to address this complex problem is shown in following diagram 1.
+It could become a complex problem if this service should support real big parameter 'n' in Fibonacci(n), like number larger than one billion. One of possible architecture to address this complex problem is shown in following diagram 1.
 
 ![Alt text](doc/fibonaci_service_architecture.png?raw=true "Fibonacci Rest Service Architecture") 
 
@@ -125,11 +125,10 @@ Diagram 1. Overall architecture
 
 Here, the responsibility of Fibonacci calculation and Fibonacci request servicing are taken by Spark cluster and WSGI cluster respectively for following reasons:
 
-* Release WSGI servicers’ burden to improve serving latency
+* Relieve WSGI servicers of computation burden to improve serving latency
 * Leverage modern computation framework to compute Fibonacci number in parallel
-* Avoid duplicated Fibonacci number computation greatly
 
-According to following formulas mentioned above:  
+According to following formulas proposed by the Prof. Edsgar W Dijkstra around 1978:
 
 F(2n-1) = F(n-1)*F(n-1) + F(n)*F(n)
 
@@ -158,7 +157,7 @@ After receiving requests from different clients, Nginx servers work as load bala
 if (m >= n): 
   Retrieve Fibonacci(n) from cache directly and return
 else:
-  Layers = math.ceil(math.log2(n)) - math.ceil(math.log2(m)) // estimate the cost of computation
+  Layers = math.ceil(math.log2(n)) - math.ceil(math.log2(m)) // estimate the cost of computation based on cache
   If Layers <= MAX_FIBONACI_LAYER: # MAX_FIBONACI_LAYER is a configurable parameter
     Calculate Fibonacci(n) recursivly according to following formulas:
       F(2n-1) = F(n-1)*F(n-1) + F(n)*F(n)
@@ -172,7 +171,7 @@ In this way, WSGI servers rely on distributed cache heavily to satisfy client re
 
 Are the clients happy with this Fibonacci number service?
 
-Does the distributed key-value store cache enough Fibonacci number to service our clients? 
+Does the distributed key-value store cache enough Fibonacci number to serve our clients? 
 
 Should larger Fibonacci number be calculated and cached in advance?
 
