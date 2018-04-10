@@ -112,15 +112,16 @@ def test_get_number_too_large():
   fibo = Fibonacci(max_fibo_layer=3) 
   y = fibo.get_number(8)
   assert y == 21
-  with pytest.raises(ParamsError):
+
+  with pytest.raises(ParamsError) as excinfo:
     y = fibo.get_number(9)
+  assert 'The Fibonacci parameter is too larger' in str(excinfo.value)
 
-  # the max fibonacci number that we support is (math.pow(2, 10))
+  # the max fibonacci number that we support is (math.pow(2, 20)) = 1048576
   fibo1 = Fibonacci() 
-  y = fibo1.get_number(1024)
-  assert y == 4506699633677819813104383235728886049367860596218604830803023149600030645708721396248792609141030396244873266580345011219530209367425581019871067646094200262285202346655868899711089246778413354004103631553925405243
-  with pytest.raises(ParamsError):
-    y = fibo.get_number(1025)
+  y = fibo1.get_number(1048576)
+  assert y > 0
 
-def test_get_number_with_cache():
-  """ TODO: Test the get_number function with cache """
+  with pytest.raises(ParamsError) as excinfo:
+    y = fibo1.get_number(1048577)
+  assert 'The Fibonacci parameter is too larger' in str(excinfo.value)
