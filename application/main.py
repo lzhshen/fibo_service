@@ -59,7 +59,6 @@ def fibonacci(n):
     fibo = Fibonacci()
     seq = fibo.get_sequence(n, offset, limit)
     resp_data = RespData(n, offset, limit, seq, '/api/fibonacci')
-    #response = jsonify(results = seq)
     response = jsonify(results=resp_data.data())
     response.status_code = 200
   except Exception as e:
@@ -67,8 +66,6 @@ def fibonacci(n):
     response = jsonify(message = str(e))
     response.status_code = 403
   return response
-
-app.wsgi_app = ProxyFix(app.wsgi_app)
 
 if __name__ == '__main__':
   app.run()

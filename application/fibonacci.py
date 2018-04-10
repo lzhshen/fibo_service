@@ -82,14 +82,11 @@ class Fibonacci(object):
     else:
       if(n & 1) : # n is odd
         k = (n + 1) // 2
+        fib = (self.get_number(k) * self.get_number(k) + self.get_number(k-1) * self.get_number(k-1))
       else :  # n is even
         k = n // 2
-       
-      # Applyting formula
-      if((n & 1) ) :
-        fib = (self.get_number(k) * self.get_number(k) + self.get_number(k-1) * self.get_number(k-1))
-      else :
         fib = (2*self.get_number(k-1) + self.get_number(k)) * self.get_number(k)
+
       # store in map
       self.__map[n] = fib
       return fib
