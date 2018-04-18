@@ -143,7 +143,7 @@ As for the distributed key-value store, popular key-value nosql, like HBase, cou
 ![Alt text](doc/fibonacci_layer.png?raw=true "Logic layer of Fibonacci sequence ")
 
 <p align="center">
-Diagram 2. Fibonacci sequence number organized 
+Diagram 2. Fibonacci sequence number organized in layers
 </p>
 
 ### Strategy to serve Fibonacci request
